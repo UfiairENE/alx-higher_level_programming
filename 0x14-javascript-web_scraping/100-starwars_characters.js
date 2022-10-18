@@ -1,17 +1,16 @@
 #!/usr/bin/node
 
-const request = require('request');
+const axios = require('axios').default;
+const url = 'https://swapi-api.hbtn.io/api/films/' + process.argv[2];
 
-request('http://swapi.co/api/films/' + process.argv[2], function (error, response, body) {
-  if (error) {
-    console.error(error);
-  }
-  JSON.parse(body).characters.forEach(function (url, callback) {
-    request(url, function (error, response, body) {
-      if (error) {
-        console.error(error);
-      }
-      console.log(JSON.parse(body).name);
-    });
+axios.get(url)
+  .then(function (response) {
+    response.data.characters.forEach(getName);
   });
-});
+
+function getName (item, index, arr) {
+  axios.get(item)
+    .then(function (resp) {
+      console.log(resp.data.name);
+    });
+}
