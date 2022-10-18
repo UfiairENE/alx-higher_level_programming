@@ -1,25 +1,22 @@
 #!/usr/bin/node
 
-const axios = require('axios').default;
-const url = process.argv[2];
-const dict = {};
+const request = require('request');
 
-axios.get(url)
-  .then(function (response) {
-    const bodyResponse = response.data;
-    for (const todos of bodyResponse) {
-      const id = todos.userId;
-      if (!(id in dict)) {
-        dict[id] = undefined;
+request(process.argv[2], function (error, response, body) {
+  if (error) {
+    console.error(error);
+  }
+  const dict = JSON.parse(body).reduce((acc, elem) => {
+    if (!acc[elem.userId]) {
+      if (elem.completed) {
+        acc[elem.userId] = 1;
       }
-      if (todos.completed === true) {
-        dict[id] = dict[id] + 1 || 1;
-      }
-    }
-    for (const user in dict) {
-      if (dict[user] === undefined) {
-        delete dict[user];
+    } else {
+      if (elem.completed) {
+        acc[elem.userId] += 1;
       }
     }
-    console.log(dict);
-  });
+    return acc;
+  }, {});
+  console.log(dict);
+});

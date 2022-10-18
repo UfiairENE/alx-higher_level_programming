@@ -1,16 +1,20 @@
 #!/usr/bin/node
 
-const axios = require('axios').default;
-axios.get(process.argv[2])
-  .then(function (response) {
-    const movies = response.data.results;
-    let count = 0;
-    movies.forEach(dict => {
-      for (const chars of dict.characters) {
-        if (chars.includes('people/18/')) {
-          count += 1;
-        }
-      }
-    });
-    console.log(count);
-  });
+const request = require('request');
+
+request(process.argv[2], function (error, response, body) {
+  if (error) {
+    console.error(error);
+  }
+  /* const nb = JSON.parse(body).results.reduce((acc, elem) => {
+    acc += elem.characters.reduce((acc, character) => {
+      return (character === 'https://swapi.co/api/people/18/' ? acc + 1 : acc);
+    }, 0);
+    return (acc);
+  }, 0);
+  */
+  const nb = JSON.parse(body).results.filter((elem) => {
+    return elem.characters.filter((url) => { return url.includes('18'); }).length;
+  }).length;
+  console.log(nb);
+});

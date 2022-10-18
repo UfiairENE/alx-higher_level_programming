@@ -1,23 +1,51 @@
 #!/usr/bin/node
 
-const axios = require('axios').default;
-const url = 'https://swapi-api.hbtn.io/api/films/' + process.argv[2];
+const request = require('request');
 
-axios.get(url)
-  .then(function (response) {
-    getName(response.data.characters);
-  })
-  .catch(err => {
-    console.error(err);
-  });
+/*
+let characters = [];
+let dict = {};
 
-async function getName (charList) {
-  try {
-    for (const url of charList) {
-      const resp = await axios.get(url);
-      console.log(resp.data.name);
-    }
-  } catch (err) {
-    console.error(err);
-  }
+function addToDict (url, name) {
+  dict[url] = name;
 }
+
+request('http://swapi.co/api/films/' + process.argv[2], function (error, response, body) {
+  if (error) {
+    console.error(error);
+  }
+  characters = JSON.parse(body).characters
+  characters.forEach(function (url) {
+    request(url, function (error, response, body) {
+      if (error) {
+        console.error(error);
+      }
+      addToDict(url, JSON.parse(body).name);
+    });
+  });
+  characters.forEach(function (item) {
+    console.log(dict[item]);
+  })
+});
+*/
+
+function helpRequest (arr, i) {
+  if (i === arr.length) {
+    return;
+  }
+  request(arr[i], function (error, response, body) {
+    if (error) {
+      console.error(error);
+    }
+    console.log(JSON.parse(body).name);
+    helpRequest(arr, i + 1);
+  });
+}
+
+request('http://swapi.co/api/films/' + process.argv[2], function (error, response, body) {
+  if (error) {
+    console.error(error);
+  }
+  const charac = JSON.parse(body).characters;
+  helpRequest(charac, 0);
+});
